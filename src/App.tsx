@@ -35,9 +35,35 @@ const App = () => {
 
     const getTotalItems = (items: CartItemType[]) => items.reduce((acc: number, item) => acc + item.amount, 0)
 
-    const handleAddToCart = (clieckedItem: CartItemType) => null
+    const handleAddToCart = (clieckedItem: CartItemType) => {
+        setCartItems(prev => {
+            const isAdded = prev.find(item => item.id === clieckedItem.id)
 
-    const handleRemoveFromCart = () => null
+            if (isAdded) {
+                return prev.map(item => (
+                    item.id === clieckedItem.id
+                        ? { ...item, amount: ++item.amount }
+                        : item
+                ))
+            }
+
+            return [...prev, { ...clieckedItem, amount: 1 }]
+        })
+    }
+
+    const handleRemoveFromCart = (id: number) => {
+        setCartItems(prev => (
+            prev.reduce((acc, item) => {
+                if (item.id === id) {
+                    if (item.amount === 1) return acc
+                    return [...acc, { ...item, amount: --item.amount }]
+                }
+                else {
+                    return [ ...acc, item ]
+                }
+            }, [] as CartItemType[] )
+        ))
+    }
 
     if (isLoading) return <LinearProgress />
     if (error) return <div>Something went wrong :(</div>
